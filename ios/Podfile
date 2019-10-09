@@ -1,8 +1,8 @@
 platform :ios, '9.0'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
-target 'smssend' do
-  # Pods for smssend
+target 'smsodoo' do
+  # Pods for smsodoo
   pod 'FBLazyVector', :path => "../node_modules/react-native/Libraries/FBLazyVector"
   pod 'FBReactNativeSpec', :path => "../node_modules/react-native/Libraries/FBReactNativeSpec"
   pod 'RCTRequired', :path => "../node_modules/react-native/Libraries/RCTRequired"
@@ -34,10 +34,9 @@ target 'smssend' do
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
-
-
-  target 'smssendTests' do
+  target 'smsodooTests' do
     inherit! :search_paths
     # Pods for testing
   end
@@ -45,10 +44,10 @@ target 'smssend' do
   use_native_modules!
 end
 
-target 'smssend-tvOS' do
-  # Pods for smssend-tvOS
+target 'smsodoo-tvOS' do
+  # Pods for smsodoo-tvOS
 
-  target 'smssend-tvOSTests' do
+  target 'smsodoo-tvOSTests' do
     inherit! :search_paths
     # Pods for testing
   end

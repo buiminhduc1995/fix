@@ -1,17 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {PureComponent} from 'react';
-import {
-  View,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  Alert,
-  AsyncStorage,
-} from 'react-native';
+import {View, Text, TextInput, TouchableOpacity, Alert,ImageBackground} from 'react-native';
 import styles from './Login.styles';
 import {connect} from 'react-redux';
-import {saveAuthentication} from '../../redux/action/';
+import {saveAuthentication} from '../../redux/action';
+import {background} from '../../image/index'
 class index extends PureComponent {
   static navigationOptions = {
     header: null,
@@ -23,41 +16,26 @@ class index extends PureComponent {
       password: '',
     };
   }
-  persistData() {
-    let username = this.state.username;
-    let password = this.state.password;
-    AsyncStorage.setItem('username', username);
-    AsyncStorage.setItem('password', password);
-  }
-  check() {
-    AsyncStorage.getItem('username').then(username => {
-      this.setState({username: username});
-    });
-    AsyncStorage.getItem('password').then(password => {
-      this.setState({password: password});
-    });
-  }
-  componentDidMount() {
-    this.check();
-  }
   login = () => {
+    // axios or fetch API or XMLHTTP
     var xhr = new XMLHttpRequest();
-    var jsonResponse = '';
+    var jsonRespones = '';
     xhr.open('POST', 'http://192.168.17.2:8069/api/authentication', true);
-    xhr.setRequestHeader('Content-type', 'multipart/form-data');
+    xhr.setRequestHeader('Content-Type', 'multipart/form-data');
     xhr.onreadystatechange = () => {
       if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
         var data = xhr.responseText;
-        jsonResponse = JSON.parse(data);
-        if (jsonResponse.token !== 'undefined') {
-          this.persistData();
-          this.props.saveAuthentication(jsonResponse.name, jsonResponse.token);
-          this.props.navigation.navigate('HomeScreen');
-        } else {
-          Alert.alert(
-            'Thông báo',
-            'Vui lòng kiểm tra lại tên đăng nhập và mật khẩu',
+        jsonRespones = JSON.parse(data);
+        if (jsonRespones.token !== undefined) {
+          this.props.saveAuthentication(
+            jsonRespones.name,
+            jsonRespones.token,
+            this.state.username,
           );
+          Alert.alert('Noti', 'Login success');
+          this.props.navigation.navigate('HomeScreen')
+        } else {
+          Alert.alert('Noti', 'Login fail');
         }
       }
     };
@@ -66,51 +44,53 @@ class index extends PureComponent {
     formData.append('pw', this.state.password);
     xhr.send(formData);
   };
+  printRedux = () => {
+    console.log('====================================');
+    console.log(this.props.name, this.props.token, this.props.username);
+    console.log('====================================');
+    this.props.navigation.navigate('HomeScreen')
+  };
   render() {
     return (
-      <View style={styles.container}>
-        <StatusBar hidden />
-        <Text>LOGIN</Text>
-        <View
+      <ImageBackground source={background} style={styles.container}>
+        <TextInput
+          style={{width: '60%', height: 40, backgroundColor: 'gray',borderRadius:5}}
+          placeholder="Insert Username"
+          onChangeText={text => this.setState({username: text})}
+          value={this.state.username}
+        />
+        <TextInput
           style={{
-            height: 50,
             width: '60%',
-            backgroundColor: 'red',
-            borderRadius: 5,
-          }}>
-          <TextInput
-            placeholder="Username"
-            value={this.state.username}
-            onChangeText={txt => this.setState({username: txt})}
-          />
-        </View>
-        <View
-          style={{
-            height: 50,
-            width: '60%',
-            backgroundColor: 'red',
-            borderRadius: 5,
-            marginTop: 10,
-          }}>
-          <TextInput
-            placeholder="Password"
-            value={this.state.password}
-            onChangeText={txt => this.setState({password: txt})}
-          />
-        </View>
-
+            height: 40,
+            backgroundColor: 'gray',
+            marginTop: 5,
+            borderRadius:5
+          }}
+          placeholder="Insert Password"
+          secureTextEntry={true}
+          onChangeText={text => this.setState({password: text})}
+          value={this.state.password}
+        />
         <TouchableOpacity onPress={() => this.login()}>
           <Text>Login</Text>
         </TouchableOpacity>
-      </View>
+        <Text onPress={() => this.printRedux()}>Print Redux Authen</Text>
+      </ImageBackground>
     );
   }
+}
+function mapStateToProps(state) {
+  return {
+    name: state.authentication.name,
+    token: state.authentication.token,
+    username: state.authentication.username,
+  };
 }
 const mapDispatchToProps = {
   saveAuthentication,
 };
-
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps,
 )(index);
